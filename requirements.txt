@@ -1,0 +1,11 @@
+python-dotenv
+sqlalchemy
+langchain-core
+typing-extensions
+pydantic
+langchain-openai
+langgraph
+colorama
+matplotlib
+pandas
+openai
