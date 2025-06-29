@@ -49,7 +49,7 @@ def get_retriever(
     filter_expression: Optional[str] = None,
 ) -> Retriever:
     """
-    Factory to create a MilvusRetriever.
+    Factory to create a Milvus Retriever.
     """
     return Retriever(
         client=client,
