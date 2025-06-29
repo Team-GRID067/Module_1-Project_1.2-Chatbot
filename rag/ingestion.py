@@ -4,7 +4,7 @@ from langchain.document_loaders import UnstructuredPDFLoader
 from langchain_experimental.text_splitter import SemanticChunker
 
 from rag.embedding import create_sentence_embedding
-from rag.vectordb import initialize_and_index_db
+from rag.vectordb import initialize_or_get_db
 def PDF_parser(pdf_folder):
     docs = []
     for pdf_path in os.listdir(pdf_folder):
@@ -30,7 +30,7 @@ def ingest_database(pdf_folder, db_path, collection_name):
     sem_chunker = get_text_spliter(embedding)
     chunked_docs= sem_chunker.split_documents(documents)
     
-    client = initialize_and_index_db(
+    client = initialize_or_get_db(
         db_path=db_path,
         collection_name=collection_name,
         docs=chunked_docs,

@@ -1,6 +1,6 @@
 from pymilvus import MilvusClient
 
-def initialize_and_index_db(
+def initialize_or_get_db(
     db_path: str,
     collection_name: str,
     docs,
