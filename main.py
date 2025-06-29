@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from graph.workflow import app
-
+from agent.state import AgentState
 load_dotenv()
 
 # Example usage
@@ -14,8 +14,8 @@ if __name__ == "__main__":
         "relevance": "",
         "sql_error": False
     }
-    
-    for output in app.stream(input_state):
+    state= AgentState(**input_state)
+    for output in app.stream(state):
         for key, value in output.items():
             print(f"Node '{key}':")
             print(value["question"], value["sql_query"], value["query_result"], sep="\n")
