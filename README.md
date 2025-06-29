@@ -4,3 +4,4 @@
 - Add Model
 - Add UI
 - Add Chat History
+- Add Fake Data
