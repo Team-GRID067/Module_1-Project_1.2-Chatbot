@@ -3,3 +3,4 @@
 ## To do
 - Add Model
 - Add UI
+- Add Chat History
