@@ -5,12 +5,14 @@ from nodes.query_generation import convert_nl_to_sql, regenerate_query
 from nodes.execution import execute_sql, execute_sql_router
 from nodes.response_generation import generate_human_readable_answer, generate_funny_response
 from nodes.error_handling import end_max_iterations, check_attempts_router
-
+from nodes.retrieve_context import retrieve_context
 def create_workflow():
     workflow = StateGraph(AgentState)
     
     # Add nodes
     workflow.add_node("check_relevance", check_relevance)
+    workflow.add_node("retrieve_context", retrieve_context)
+
     workflow.add_node("convert_to_sql", convert_nl_to_sql)
     workflow.add_node("execute_sql", execute_sql)
     workflow.add_node("generate_human_readable_answer", generate_human_readable_answer)
@@ -22,8 +24,9 @@ def create_workflow():
     workflow.add_conditional_edges(
         "check_relevance",
         relevance_router,
-        {"convert_to_sql": "convert_to_sql", "generate_funny_response": "generate_funny_response"},
+        {"retrieve_context": "retrieve_context", "generate_funny_response": "generate_funny_response"},
     )
+    workflow.add_edge("retrieve_context", "convert_to_sql")
     workflow.add_edge("convert_to_sql", "execute_sql")
     workflow.add_conditional_edges(
         "execute_sql",

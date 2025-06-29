@@ -7,9 +7,14 @@ from colorama import Fore, Style
 def convert_nl_to_sql(state, config):
     question = state["question"]
     schema = get_database_schema()
-    system = f"""You are an assistant that converts natural language questions into SQL queries based on the following schema:
-    
+    context = state.get("retrieved_context", "")
+    system = f"""You are an assistant that converts natural language questions into SQL queries based on the following 
+    schema:
     {schema}
+    
+    
+    Additional Context:
+    {context}
     
     The current question is '{question}'. Ensure that all query-related data is scoped to this question.
     
