@@ -25,7 +25,7 @@ def get_text_spliter(embeddings):
         add_start_index=True
     )
 
-def ingest_database(pdf_folder, db_path, collection_name):
+def ingest_database( collection_name,pdf_folder = "doc/", db_path="ai_courses.db"):
     documents = PDF_parser(pdf_folder)
     tokenized_docs = tokenize_docs(documents)
     embedding = create_sentence_embedding()

@@ -1,13 +1,14 @@
 from pymilvus import MilvusClient
 
 def initialize_or_get_db(
-    db_path: str,
+    
     collection_name: str,
     docs,
     embedding_model,
+    db_path: str = "rag/ai_courses.db",
     dimension: int = 384
 ):
-    client = MilvusClient(db_path)
+    client = MilvusClient(uri=db_path)
 
     if not client.has_collection(collection_name):
         client.create_collection(
@@ -19,7 +20,7 @@ def initialize_or_get_db(
         print(f"Collection '{collection_name}' already exists.")
 
     texts = [doc.page_content for doc in docs]
-    vectors = embedding_model.embed_documents(texts)
+    vectors = embedding_model.encode(texts)
 
     data = [
         {
