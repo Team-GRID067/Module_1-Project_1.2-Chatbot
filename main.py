@@ -12,7 +12,7 @@ def init_db():
     # Khởi tạo retriever config
     embedding = create_sentence_embedding()
     milvus_client = initialize_or_get_db(
-        db_path="vector_db/vector_db",
+        db_path="rag/ai_courses.db",
         collection_name="docs",
         docs=[],  # nếu collection đã tồn tại thì bỏ trống docs cũng được
         embedding_model=embedding,
