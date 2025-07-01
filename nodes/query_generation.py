@@ -1,4 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 from agent.state import ConvertToSQL, RewrittenQuestion
 from agent.sql_agent import llm
 from sql_db.schema import get_database_schema
@@ -8,36 +9,54 @@ def convert_nl_to_sql(state, config):
     question = state["question"]
     schema = get_database_schema()
     context = state.get("retrieved_context", "")
-    system = f"""You are an assistant that converts natural language questions into SQL queries based on the following 
-    schema:
-    {schema}
-    
-    
-    Additional Context:
-    {context}
-    
-    The current question is '{question}'. Ensure that all query-related data is scoped to this question.
-    
-    Provide only the SQL query without any explanations. Alias columns appropriately to match the expected keys in the result.
-    """
-    convert_prompt = ChatPromptTemplate.from_messages(
-        [("system", system), ("human", "Question: {question}")]
-    )
-    structured_llm = llm.with_structured_output(ConvertToSQL)
-    sql_generator = convert_prompt | structured_llm
-    result = sql_generator.invoke({"question": question})
-    state["sql_query"] = result.sql_query
+    system = f"""Bạn là một trợ lý AI giúp chuyển đổi câu hỏi bằng ngôn ngữ tự nhiên thành truy vấn SQL dựa trên cấu trúc cơ sở dữ liệu sau:
+
+{schema}
+
+Nếu có ngữ cảnh bổ sung, hãy tận dụng để làm rõ mục đích truy vấn:
+{context}
+
+Câu hỏi hiện tại là: '{question}'
+
+Hãy tạo truy vấn SQL phù hợp, không giải thích gì thêm. Chỉ trả về câu SQL."""
+    convert_prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        ("human", question)
+    ])
+
+    sql_generator = convert_prompt | llm | StrOutputParser()
+
+    try:
+        raw_output = sql_generator.invoke({})
+        sql = extract_sql(raw_output)
+        state["sql_query"] = sql
+        state["sql_error"] = False
+    except Exception as e:
+        print(Fore.RED + f"[LỖI] Không thể tạo SQL: {e}" + Style.RESET_ALL)
+        state["sql_query"] = ""
+        state["sql_error"] = True
+
     return state
 
+    
 def regenerate_query(state):
     question = state["question"]
-    system = """You are an assistant that reformulates an original question to enable more precise SQL queries."""
-    rewrite_prompt = ChatPromptTemplate.from_messages(
-        [("system", system), ("human", f"Original Question: {question}\nReformulate...")]
-    )
-    structured_llm = llm.with_structured_output(RewrittenQuestion)
-    rewriter = rewrite_prompt | structured_llm
-    rewritten = rewriter.invoke({})
-    state["question"] = rewritten.question
-    state["attempts"] += 1
+
+    system_prompt = """Bạn là một trợ lý AI chuyên viết lại câu hỏi để dễ chuyển đổi thành truy vấn SQL.
+    Giữ nguyên ý nghĩa ban đầu, nhưng làm cho rõ ràng và cụ thể hơn."""
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        ("human", f"Câu gốc: {question}\nHãy viết lại câu này cho rõ ràng hơn để dễ tạo câu SQL.")
+    ])
+
+    try:
+        rewriter = prompt | llm | StrOutputParser()
+        rewritten = rewriter.invoke({})
+        state["question"] = rewritten.strip()
+        state["attempts"] += 1
+    except Exception as e:
+        print(Fore.RED + f"[LỖI] Không thể viết lại câu hỏi: {e}" + Style.RESET_ALL)
+        state["sql_error"] = True
+
     return state

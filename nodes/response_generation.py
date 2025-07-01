@@ -2,8 +2,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from agent.sql_agent import llm
 
+
+
 def generate_human_readable_answer(state):
-    system = """You are an assistant that converts SQL query results into clear, natural language responses."""
+    system = """Bạn là một trợ lý AI giúp diễn giải kết quả truy vấn SQL thành câu trả lời rõ ràng và dễ hiểu bằng tiếng Việt."""
     sql = state["sql_query"]
     result = state.get("query_rows", [])
     
@@ -20,8 +22,9 @@ def generate_human_readable_answer(state):
     return state
 
 def generate_funny_response(state):
-    system = """You are a charming and funny assistant who responds in a playful manner."""
-    human_message = "I can not help with that, but doesn't asking questions make you come closer to the problem?"
+    system ="""Bạn là một trợ lý AI thông minh, thân thiện và hài hước. 
+Trả lời câu hỏi của người dùng **bằng tiếng Việt** và có thể thêm chút dí dỏm."""
+    human_message = state['question']
     funny_prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human_message)])
     funny_response = funny_prompt | llm | StrOutputParser()
     state["query_result"] = funny_response.invoke({})
