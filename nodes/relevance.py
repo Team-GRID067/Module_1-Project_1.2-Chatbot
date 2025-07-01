@@ -15,11 +15,19 @@ def check_relevance(state, config):
     Respond with only "relevant" or "not_relevant".
     """
     human = f"Question: {question}"
-    check_prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    structured_llm = llm.with_structured_output(CheckRelevance)
-    relevance_checker = check_prompt | structured_llm
-    relevance = relevance_checker.invoke({})
-    state["relevance"] = relevance.relevance
+    prompt = f"{system}\n\n{human}"
+
+    response = llm.invoke(prompt)
+
+    
+    relevance_str = response.lower() if isinstance(response, str) else str(response).lower()
+
+    if "relevant" in relevance_str and "not" not in relevance_str:
+        relevance = "relevant"
+    else:
+        relevance = "not_relevant"
+
+    state["relevance"] = relevance
     return state
 
 def relevance_router(state):

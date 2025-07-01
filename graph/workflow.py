@@ -25,7 +25,7 @@ def create_workflow():
     workflow.add_conditional_edges(
         "check_relevance",
         relevance_router,
-        {"retrieve_context": "retrieve_context", "generate_funny_response": "generate_funny_response"},
+        {"retrieve_context": "retrieve_context", "generate_funny_response": "generate_funny_response","convert_to_sql":"convert_to_sql"},
     )
     workflow.add_edge("retrieve_context", "convert_to_sql")
     workflow.add_edge("convert_to_sql", "check_sensitive_query")
