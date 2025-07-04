@@ -2,6 +2,9 @@ import os
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 from langchain_community.llms import HuggingFacePipeline
+from langchain_core.messages import AIMessage
+from langchain_core.outputs import ChatGeneration
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 import google.generativeai as genai
 from langchain_core.language_models import BaseChatModel
@@ -37,39 +40,48 @@ def load_local_model():
 
     return HuggingFacePipeline(pipeline=generation_pipeline)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "<YOUR_GEMINI_API_KEY>")
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel(model_name="gemini-pro")
+# GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# genai.configure(api_key=GOOGLE_API_KEY)
+# gemini_model = genai.GenerativeModel(model_name="gemini-pro")
 
 
-class GeminiChat(BaseChatModel):
-    """LangChain-compatible Gemini Chat wrapper"""
+# class GeminiChat(BaseChatModel):
+#     """LangChain-compatible Gemini Chat wrapper"""
 
-    def _convert_messages_to_prompt(self, messages):
-        parts = []
-        for msg in messages:
-            if isinstance(msg, SystemMessage):
-                parts.append(f"[System]: {msg.content}")
-            elif isinstance(msg, HumanMessage):
-                parts.append(f"[User]: {msg.content}")
-            elif isinstance(msg, AIMessage):
-                parts.append(f"[AI]: {msg.content}")
-        return "\n".join(parts)
+#     def _convert_messages_to_prompt(self, messages):
+#         parts = []
+#         for msg in messages:
+#             if isinstance(msg, SystemMessage):
+#                 parts.append(f"[System]: {msg.content}")
+#             elif isinstance(msg, HumanMessage):
+#                 parts.append(f"[User]: {msg.content}")
+#             elif isinstance(msg, AIMessage):
+#                 parts.append(f"[AI]: {msg.content}")
+#         return "\n".join(parts)
 
-    def _call(self, messages, stop=None):
-        prompt = self._convert_messages_to_prompt(messages)
-        response = gemini_model.generate_content(prompt)
-        return response.text
+#     def _call(self, messages, stop=None):
+#         prompt = self._convert_messages_to_prompt(messages)
+#         response = gemini_model.generate_content(prompt)
+#         return response.text
 
-    def _generate(self, messages, stop=None, run_manager: RunnableConfig = None) -> LLMResult:
-        text = self._call(messages, stop)
-        gen = Generation(message=AIMessage(content=text))
-        return LLMResult(generations=[[gen]])
+#     def _generate(self, messages, stop=None, run_manager: RunnableConfig = None) -> LLMResult:
+#         text = self._call(messages, stop)
+#         ai_msg = AIMessage(content=text)
+#         gen = ChatGeneration(message=ai_msg, text=text)
+#         return LLMResult(generations=[[gen]])
 
-    @property
-    def _llm_type(self) -> str:
-        return "gemini-chat"
+#     @property
+#     def _llm_type(self) -> str:
+#         return "gemini-chat"
+
+
+llm_gemini = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite-preview-06-17",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+)
 
 
 llm = load_local_model()
-llm_gemini = GeminiChat()
