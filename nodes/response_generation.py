@@ -35,6 +35,6 @@ Trả lời câu hỏi của người dùng **bằng tiếng Việt** và có th
     ])
     
     funny_response = funny_prompt | llm 
-    response = funny_response.invoke({})  
+    response = funny_response.invoke({"input": human_message})  
     state["query_result"] = response.content
     return state

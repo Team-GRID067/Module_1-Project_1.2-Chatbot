@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 from agent.state import CheckRelevance
-from agent.sql_agent import llm
+from agent.sql_agent import llm, llm_gemini
 from sql_db.schema import get_database_schema
 from colorama import Fore, Style
 
@@ -17,7 +17,7 @@ def check_relevance(state, config):
     human = f"Question: {question}"
     prompt = f"{system}\n\n{human}"
 
-    response = llm.invoke(prompt)
+    response = llm_gemini.invoke(prompt)
 
     
     relevance_str = response.lower() if isinstance(response, str) else str(response).lower()
