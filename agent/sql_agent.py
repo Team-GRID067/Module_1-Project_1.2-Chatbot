@@ -1,7 +1,7 @@
 import os
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
-from langchain.llms import HuggingFacePipeline
+from langchain_community.llms import HuggingFacePipeline
 
 import google.generativeai as genai
 from langchain_core.language_models import BaseChatModel
