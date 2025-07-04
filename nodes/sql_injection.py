@@ -38,7 +38,7 @@ def validate_sql(text,
         if re.search(rf"\b{keyword}\b", query_lower):
             return True
 
-    predicted_class, confidence = SqlInjectionChecker.predict(text)
+    predicted_class, confidence = sql_checker.predict(text)
     if predicted_class > 0.7:
         return True
     

@@ -3,7 +3,7 @@ from agent.state import AgentState
 from nodes.relevance import check_relevance, relevance_router
 from nodes.query_generation import convert_nl_to_sql, regenerate_query
 from nodes.execution import execute_sql, execute_sql_router
-from nodes.response_generation import generate_human_readable_answer, generate_funny_response
+from nodes.response_generation import generate_human_readable_answer, generate_funny_response , generate_funny_response_vinallama, generate_human_readable_answer_vinallama
 from nodes.error_handling import end_max_iterations, check_attempts_router
 from nodes.retrieve_context import retrieve_context
 from nodes.sql_injection import check_sensitive_query
@@ -16,8 +16,8 @@ def create_workflow():
     workflow.add_node("check_sensitive_query", check_sensitive_query)
     workflow.add_node("convert_to_sql", convert_nl_to_sql)
     workflow.add_node("execute_sql", execute_sql)
-    workflow.add_node("generate_human_readable_answer", generate_human_readable_answer)
-    workflow.add_node("generate_funny_response", generate_funny_response)
+    workflow.add_node("generate_human_readable_answer", generate_human_readable_answer_vinallama)
+    workflow.add_node("generate_funny_response", generate_funny_response_vinallama)
     workflow.add_node("regenerate_query", regenerate_query)
     workflow.add_node("end_max_iterations", end_max_iterations)
     
