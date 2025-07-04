@@ -17,15 +17,19 @@ def generate_human_readable_answer(state):
         prompt_template = """SQL Query:\n{sql}\nResult:\n{result}\nFormulate a clear answer."""
     
     generate_prompt = ChatPromptTemplate.from_messages([("system", system), ("human", prompt_template)])
-    human_response = generate_prompt | llm | StrOutputParser()
-    state["query_result"] = human_response.invoke({"sql": sql, "result": str(result)})
+    human_response = generate_prompt | llm
+    response = human_response.invoke({"sql": sql, "result": str(result)})
+    
+    state["query_result"] = response.content
     return state
+
 
 def generate_funny_response(state):
     system ="""Bạn là một trợ lý AI thông minh, thân thiện và hài hước. 
 Trả lời câu hỏi của người dùng **bằng tiếng Việt** và có thể thêm chút dí dỏm."""
     human_message = state['question']
     funny_prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human_message)])
-    funny_response = funny_prompt | llm | StrOutputParser()
-    state["query_result"] = funny_response.invoke({})
+    funny_response = funny_prompt | llm 
+    response = funny_response.invoke({})  
+    state["query_result"] = response.content
     return state
