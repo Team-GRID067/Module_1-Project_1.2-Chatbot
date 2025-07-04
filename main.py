@@ -4,6 +4,7 @@ from graph.workflow import app
 from agent.state import AgentState
 from rag.vectordb import initialize_or_get_db
 from rag.embedding import create_sentence_embedding
+from rag.ingestion import ingest_database
 from langchain_community.document_loaders import PyPDFLoader
 import tempfile
 import os
@@ -25,57 +26,7 @@ if "embedding_model" not in st.session_state:
     st.session_state.embedding_model = create_sentence_embedding()
 
 if "milvus_client" not in st.session_state:
-    st.session_state.milvus_client = initialize_or_get_db(
-        db_path="rag/ai_courses.db",
-        collection_name="docs",
-        docs=st.session_state.pdf_texts,
-        embedding_model=st.session_state.embedding_model,
-        dimension=st.session_state.embedding_model.get_sentence_embedding_dimension()
-    )
-
-# ----------- UPLOAD PDF -----------
-uploaded_files = st.file_uploader("📎 Tải lên các file PDF", type=["pdf"], accept_multiple_files=True)
-
-if uploaded_files:
-    all_clean_docs = []
-
-    for uploaded_file in uploaded_files:
-        if uploaded_file is not None:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-                tmp_file.write(uploaded_file.getvalue())
-                tmp_file_path = tmp_file.name
-
-            try:
-                loader = PyPDFLoader(tmp_file_path)
-                documents = loader.load()
-
-                # Làm sạch từng document
-                clean_docs = []
-                for doc in documents:
-                    content = doc.page_content.strip()
-                    if content and isinstance(content, str):
-                        doc.page_content = content[:1000]  # Giới hạn độ dài nếu cần
-                        clean_docs.append(doc)
-
-                all_clean_docs.extend(clean_docs)
-
-            finally:
-                os.unlink(tmp_file_path)
-
-    # Chỉ thêm vào session nếu có văn bản hợp lệ
-    if all_clean_docs:
-        st.session_state.pdf_texts.extend(all_clean_docs)
-
-        # Cập nhật lại vector DB sau khi upload
-        st.session_state.milvus_client = initialize_or_get_db(
-            db_path="rag/ai_courses.db",
-            collection_name="docs",
-            docs=st.session_state.pdf_texts,
-            embedding_model=st.session_state.embedding_model,
-            dimension=st.session_state.embedding_model.get_sentence_embedding_dimension()
-        )
-    else:
-        st.warning("⚠️ Không tìm thấy văn bản hợp lệ trong các file PDF đã tải.")
+    st.session_state.milvus_client = ingest_database(collection_name = "docs")
 
 # ----------- CLEAR BUTTON -----------
 if st.button("🧹 Xoá lịch sử"):
