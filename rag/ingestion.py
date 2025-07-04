@@ -10,7 +10,7 @@ def PDF_parser(pdf_folder):
     docs = []
     for pdf_path in os.listdir(pdf_folder):
         if pdf_path.endswith(".pdf"):
-            loader = UnstructuredPDFLoader(pdf_path, strategy="hi-res")  
+            loader = UnstructuredPDFLoader(pdf_path, strategy="auto")  
             doc = loader.load()
             docs.extend(doc)
     return docs
