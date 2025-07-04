@@ -11,9 +11,6 @@ def execute_sql(state):
             columns = result.keys()
             state["query_rows"] = [dict(zip(columns, row)) for row in rows] if rows else []
             state["query_result"] = f"{len(state['query_rows'])} rows found." if rows else "No results found"
-        else:
-            session.commit()
-            state["query_result"] = "The action has been successfully completed."
         state["sql_error"] = False
     except Exception as e:
         state["query_result"] = f"Error executing SQL query: {str(e)}"

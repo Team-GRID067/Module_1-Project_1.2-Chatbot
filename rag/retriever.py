@@ -3,9 +3,6 @@ from typing import List, Optional
 from langchain.schema import Document
 
 class Retriever:
-    """
-    A simple retriever using MilvusClient.
-    """
     def __init__(
         self,
         client: MilvusClient,
@@ -48,9 +45,7 @@ def get_retriever(
     top_k: int = 5,
     filter_expression: Optional[str] = None,
 ) -> Retriever:
-    """
-    Factory to create a Milvus Retriever.
-    """
+
     return Retriever(
         client=client,
         collection_name=collection_name,
