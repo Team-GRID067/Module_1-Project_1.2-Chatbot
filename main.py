@@ -33,7 +33,7 @@ if st.button("🧹 Xoá lịch sử"):
     st.session_state.chat_history.clear()
     st.session_state.pdf_texts.clear()
     if "milvus_client" in st.session_state:
-        del st.session_state.milvus_client
+        del ssession_state.milvus_clientt
     st.rerun()
 
 # ----------- HIỂN THỊ CHAT HISTORY -----------
