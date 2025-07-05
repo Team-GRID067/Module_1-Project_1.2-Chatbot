@@ -26,7 +26,12 @@ if "embedding_model" not in st.session_state:
     st.session_state.embedding_model = create_sentence_embedding()
 
 if "milvus_client" not in st.session_state:
-    st.session_state.milvus_client = ingest_database(collection_name = "docs")
+    embedding = st.session_state.embedding_model
+    st.session_state.milvus_client = initialize_or_get_db(
+        docs = "./doc"
+        collection_name="docs",
+        embedding_model=embedding
+    )
 
 # ----------- CLEAR BUTTON -----------
 if st.button("🧹 Xoá lịch sử"):
